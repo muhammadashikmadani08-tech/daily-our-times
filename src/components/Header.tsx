@@ -3,26 +3,23 @@ import { Search, Menu, X, Sun, Moon, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/data/categories";
-
 interface HeaderProps {
   isDark: boolean;
   toggleTheme: () => void;
 }
-
-export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
+export const Header = ({
+  isDark,
+  toggleTheme
+}: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
   const today = new Date().toLocaleDateString("bn-BD", {
     weekday: "long",
     year: "numeric",
     month: "long",
-    day: "numeric",
+    day: "numeric"
   });
-
   const mainMenuItems = categories.slice(0, 8);
-
-  return (
-    <header className="bg-background border-b border-border sticky top-0 z-50">
+  return <header className="bg-background border-b border-border sticky top-0 z-50">
       {/* Top bar */}
       <div className="container py-2 flex items-center justify-between text-sm text-muted-foreground border-b border-border">
         <span>{today}</span>
@@ -43,7 +40,9 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="bg-primary text-primary-foreground px-3 py-2 font-serif font-bold text-xl">
-              Daily
+              Daily 
+our times  
+  
             </div>
             <div className="font-serif">
               <span className="text-2xl font-bold text-foreground">Our Times</span>
@@ -56,15 +55,9 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
             <Link to="/" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">
               হোম
             </Link>
-            {mainMenuItems.map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/category/${cat.slug}`}
-                className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
-              >
+            {mainMenuItems.map(cat => <Link key={cat.id} to={`/category/${cat.slug}`} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">
                 {cat.name}
-              </Link>
-            ))}
+              </Link>)}
           </nav>
           
           {/* Search & Mobile menu */}
@@ -72,12 +65,7 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -85,25 +73,15 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
       </div>
       
       {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <nav className="lg:hidden border-t border-border bg-background">
+      {mobileMenuOpen && <nav className="lg:hidden border-t border-border bg-background">
           <div className="container py-4 flex flex-col gap-2">
             <Link to="/" className="px-3 py-2 hover:bg-muted rounded" onClick={() => setMobileMenuOpen(false)}>
               হোম
             </Link>
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/category/${cat.slug}`}
-                className="px-3 py-2 hover:bg-muted rounded"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+            {categories.map(cat => <Link key={cat.id} to={`/category/${cat.slug}`} className="px-3 py-2 hover:bg-muted rounded" onClick={() => setMobileMenuOpen(false)}>
                 {cat.name}
-              </Link>
-            ))}
+              </Link>)}
           </div>
-        </nav>
-      )}
-    </header>
-  );
+        </nav>}
+    </header>;
 };
