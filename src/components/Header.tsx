@@ -39,13 +39,13 @@ export const Header = ({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="text-primary-foreground font-serif font-bold text-xl bg-[#be2323] px-[13px] py-[9px]">
+            <div className="text-primary-foreground font-serif font-bold text-xl bg-[#be2323] px-[13px] py-[9px] rounded">
               Daily    
   
             </div>
             <div className="font-serif">
               <span className="text-2xl font-bold text-foreground">Our Times</span>
-              <div className="text-xs text-muted-foreground">সত্যের সন্ধানে</div>
+              <div className="text-xs text-muted-foreground">সত্যের সন্ধানে daily our times</div>
             </div>
           </Link>
           
