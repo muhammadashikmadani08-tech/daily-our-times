@@ -44,7 +44,7 @@ export const Header = ({
   
             </div>
             <div className="font-serif">
-              <span className="text-2xl font-bold text-foreground">Our Times</span>
+              <span className="text-2xl font-bold text-foreground text-justify py-0 px-0 mr-0 mb-0 pb-0 pr-0">Our Times</span>
               <div className="text-xs text-muted-foreground">সত্যের সন্ধানে daily our times</div>
             </div>
           </Link>
