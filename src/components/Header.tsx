@@ -39,7 +39,7 @@ export const Header = ({
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="text-primary-foreground px-3 py-2 font-serif font-bold text-xl bg-[#be2323]">
+            <div className="text-primary-foreground font-serif font-bold text-xl bg-[#be2323] px-[13px] py-[9px]">
               Daily    
   
             </div>
