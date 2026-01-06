@@ -22,30 +22,37 @@ export const useMySubmissions = () => {
   });
 };
 
-// All submissions for admin
+// All submissions for admin - fetches user profile data separately
 export const useAllUserNews = () => {
   return useQuery({
     queryKey: ["user-news", "all"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get all user news
+      const { data: newsData, error: newsError } = await supabase
         .from("user_news")
-        .select(`
-          *,
-          profile:profiles!user_news_user_id_fkey(name, email)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
       
-      if (error) {
-        // Fallback without join if foreign key doesn't exist
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from("user_news")
-          .select("*")
-          .order("created_at", { ascending: false });
-        
-        if (fallbackError) throw fallbackError;
-        return fallbackData;
-      }
-      return data;
+      if (newsError) throw newsError;
+      if (!newsData || newsData.length === 0) return [];
+
+      // Get unique user IDs
+      const userIds = [...new Set(newsData.map(n => n.user_id))];
+      
+      // Fetch profiles for those users (staff can view all profiles)
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, name, email")
+        .in("id", userIds);
+      
+      // Create a map for quick lookup
+      const profileMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+      
+      // Attach profile data to each news item
+      return newsData.map(news => ({
+        ...news,
+        profile: profileMap.get(news.user_id) || null
+      }));
     }
   });
 };
