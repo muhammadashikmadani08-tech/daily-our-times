@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { Search, Menu, X, Sun, Moon } from "lucide-react";
+import { Search, Menu, X, Sun, Moon, Send, LogIn, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCategories } from "@/hooks/useCategories";
 import { useSiteLogo } from "@/hooks/useSiteSettings";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   isDark: boolean;
@@ -14,6 +15,8 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: categories } = useCategories();
   const { data: siteLogo } = useSiteLogo();
+  const { user, signOut } = useAuth();
+  const isEmailVerified = user?.email_confirmed_at != null;
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-50">
@@ -40,14 +43,32 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
             )}
           </Link>
           
-          {/* Right side icons - Search, Theme, Menu */}
+          {/* Right side icons */}
           <div className="flex items-center gap-1">
+            {user && isEmailVerified && (
+              <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+                <Link to="/submit-news">
+                  <Send className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="h-9 w-9">
               <Search className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
+            {user ? (
+              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => signOut()}>
+                <LogOut className="h-5 w-5" />
+              </Button>
+            ) : (
+              <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+                <Link to="/auth">
+                  <LogIn className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
             <Button 
               variant="ghost" 
               size="icon" 
