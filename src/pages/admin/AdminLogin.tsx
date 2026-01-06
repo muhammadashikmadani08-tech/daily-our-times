@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,6 +103,14 @@ const AdminLogin = () => {
               লগইন
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              নতুন অ্যাকাউন্ট প্রয়োজন?{" "}
+              <Link to="/admin/signup" className="text-primary hover:underline font-medium">
+                সাইন আপ
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
