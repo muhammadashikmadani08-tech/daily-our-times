@@ -77,23 +77,35 @@ const AdminSignup = () => {
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/admin/dashboard`,
+          emailRedirectTo: `${window.location.origin}/admin/login`,
           data: { name: formData.name }
         }
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        if (authError.message?.includes("already registered")) {
+          throw new Error("এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট আছে");
+        }
+        throw authError;
+      }
 
       if (authData.user) {
-        // Assign role to the new user
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({
-            user_id: authData.user.id,
-            role: formData.role as AppRole
-          });
+        // Use RPC function to assign role (runs with SECURITY DEFINER)
+        const { error: roleError } = await supabase.rpc("assign_user_role", {
+          target_user_id: authData.user.id,
+          target_role: formData.role
+        });
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error("Role assignment error:", roleError);
+          toast({
+            title: "আংশিক সফল",
+            description: "অ্যাকাউন্ট তৈরি হয়েছে কিন্তু রোল সেট করতে সমস্যা হয়েছে। Users পেজ থেকে রোল সেট করুন।",
+            variant: "destructive"
+          });
+          navigate("/admin/users");
+          return;
+        }
 
         toast({
           title: "সফল!",
@@ -108,6 +120,8 @@ const AdminSignup = () => {
           confirmPassword: "",
           role: "moderator"
         });
+
+        navigate("/admin/users");
       }
     } catch (error: any) {
       toast({
