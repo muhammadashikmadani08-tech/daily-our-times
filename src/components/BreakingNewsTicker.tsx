@@ -1,8 +1,14 @@
-import { breakingNews } from "@/data/news";
 import { Link } from "react-router-dom";
+import { useBreakingPosts } from "@/hooks/usePosts";
 import { AlertCircle } from "lucide-react";
 
 export const BreakingNewsTicker = () => {
+  const { data: breakingNews } = useBreakingPosts();
+
+  if (!breakingNews || breakingNews.length === 0) {
+    return null;
+  }
+
   const duplicatedNews = [...breakingNews, ...breakingNews];
 
   return (
@@ -17,7 +23,7 @@ export const BreakingNewsTicker = () => {
             {duplicatedNews.map((news, index) => (
               <Link
                 key={`${news.id}-${index}`}
-                to={news.link}
+                to={`/news/${news.slug}`}
                 className="hover:underline text-sm"
               >
                 ◆ {news.title}

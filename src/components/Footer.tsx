@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Youtube } from "lucide-react";
-import { categories } from "@/data/categories";
+import { useCategories } from "@/hooks/useCategories";
 
 export const Footer = () => {
+  const { data: categories } = useCategories();
+  
   return (
     <footer className="bg-card border-t border-border mt-12">
       <div className="container py-10">
@@ -22,7 +24,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-serif font-bold mb-4">বিভাগসমূহ</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              {categories.slice(0, 8).map((cat) => (
+              {categories?.slice(0, 8).map((cat) => (
                 <Link key={cat.id} to={`/category/${cat.slug}`} className="text-muted-foreground hover:text-primary">
                   {cat.name}
                 </Link>
