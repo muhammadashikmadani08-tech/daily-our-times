@@ -163,12 +163,40 @@ Make it look like a professional social media share card from a major Bangla new
     }
 
     const aiData = await aiResponse.json();
-    console.log('AI response received');
+    console.log('AI response received:', JSON.stringify(aiData, null, 2));
 
-    const imageData = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    // Check multiple possible response structures
+    let imageData = aiData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    // Alternative structure check
+    if (!imageData) {
+      imageData = aiData.choices?.[0]?.message?.content;
+      // Check if content itself is a base64 image
+      if (imageData && !imageData.startsWith('data:image')) {
+        // Try to find image in different location
+        const images = aiData.choices?.[0]?.message?.images;
+        console.log('Images array:', JSON.stringify(images, null, 2));
+        
+        // Check for inline base64 in images array
+        if (images && images.length > 0) {
+          const firstImage = images[0];
+          imageData = firstImage?.image_url?.url || firstImage?.url || null;
+        }
+      }
+    }
 
     if (!imageData) {
-      throw new Error('No image generated from AI');
+      console.error('Full AI response:', JSON.stringify(aiData, null, 2));
+      console.error('Message content:', aiData.choices?.[0]?.message);
+      
+      // Update status to failed
+      await supabase
+        .from('photo_cards')
+        .update({ status: 'failed' })
+        .eq('post_id', postId)
+        .eq('card_type', cardType);
+      
+      throw new Error('No image generated from AI - the model may have refused due to content restrictions');
     }
 
     // Extract base64 data
