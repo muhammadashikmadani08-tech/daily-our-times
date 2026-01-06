@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import NewsDetail from "./pages/NewsDetail";
 import Category from "./pages/Category";
 import AdminLogin from "./pages/admin/AdminLogin";
+import SetupAdmin from "./pages/admin/SetupAdmin";
 import Dashboard from "./pages/admin/Dashboard";
 import Posts from "./pages/admin/Posts";
 import Categories from "./pages/admin/Categories";
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/news/:slug" element={<NewsDetail />} />
               <Route path="/category/:slug" element={<Category />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/setup" element={<SetupAdmin />} />
               <Route path="/admin/dashboard" element={<Dashboard />} />
               <Route path="/admin/posts" element={<Posts />} />
               <Route path="/admin/categories" element={<Categories />} />
