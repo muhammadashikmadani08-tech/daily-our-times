@@ -13,7 +13,7 @@ interface HeaderProps {
 export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: categories } = useCategories();
-  const { user, isStaff, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   const today = new Date().toLocaleDateString("bn-BD", {
     weekday: "long",
@@ -34,16 +34,9 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           {user ? (
-            <div className="flex items-center gap-2">
-              {isStaff && (
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/admin/dashboard">অ্যাডমিন</Link>
-                </Button>
-              )}
-              <Button variant="ghost" size="sm" onClick={() => signOut()}>
-                লগআউট
-              </Button>
-            </div>
+            <Button variant="ghost" size="sm" onClick={() => signOut()}>
+              লগআউট
+            </Button>
           ) : (
             <Button variant="ghost" size="sm" asChild>
               <Link to="/auth">

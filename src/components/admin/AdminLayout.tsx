@@ -1,59 +1,34 @@
-import { ReactNode, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { ReactNode } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, 
   FileText, 
   FolderTree, 
   Users, 
-  LogOut, 
   Menu,
   X,
   Home
 } from "lucide-react";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
 
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
+// Secret admin base path
+const SECRET_ADMIN_PATH = "/secure-admin-dashboard-9xK23";
+
 const menuItems = [
-  { icon: LayoutDashboard, label: "ড্যাশবোর্ড", path: "/admin/dashboard" },
-  { icon: FileText, label: "পোস্ট", path: "/admin/posts" },
-  { icon: FolderTree, label: "ক্যাটাগরি", path: "/admin/categories" },
-  { icon: Users, label: "ইউজার", path: "/admin/users" },
+  { icon: LayoutDashboard, label: "ড্যাশবোর্ড", path: SECRET_ADMIN_PATH },
+  { icon: FileText, label: "পোস্ট", path: `${SECRET_ADMIN_PATH}/posts` },
+  { icon: FolderTree, label: "ক্যাটাগরি", path: `${SECRET_ADMIN_PATH}/categories` },
+  { icon: Users, label: "ইউজার", path: `${SECRET_ADMIN_PATH}/users` },
 ];
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { user, isStaff, isLoading, signOut, profile } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isLoading && (!user || !isStaff)) {
-      navigate("/admin/login");
-    }
-  }, [user, isStaff, isLoading, navigate]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/admin/login");
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user || !isStaff) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-muted">
@@ -63,8 +38,10 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
         <span className="font-serif font-bold">Admin Panel</span>
-        <Button variant="ghost" size="icon" onClick={handleSignOut}>
-          <LogOut className="h-5 w-5" />
+        <Button variant="ghost" size="icon" asChild>
+          <Link to="/">
+            <Home className="h-5 w-5" />
+          </Link>
         </Button>
       </header>
 
@@ -103,23 +80,14 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
               ))}
             </nav>
 
-            {/* User Info & Actions */}
-            <div className="p-4 border-t border-border space-y-2">
-              <div className="text-sm">
-                <p className="font-medium">{profile?.name}</p>
-                <p className="text-muted-foreground text-xs">{profile?.email}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1" asChild>
-                  <Link to="/">
-                    <Home className="h-4 w-4 mr-1" />
-                    সাইট
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
+            {/* Actions */}
+            <div className="p-4 border-t border-border">
+              <Button variant="outline" size="sm" className="w-full" asChild>
+                <Link to="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  সাইটে যান
+                </Link>
+              </Button>
             </div>
           </div>
         </aside>

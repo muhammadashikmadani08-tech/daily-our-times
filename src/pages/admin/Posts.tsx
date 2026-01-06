@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,13 +12,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { usePosts, useCreatePost, useUpdatePost, useDeletePost, generateSlug } from "@/hooks/usePosts";
 import { useCategories } from "@/hooks/useCategories";
-import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Loader2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Posts = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
   const { data: posts, isLoading } = usePosts();
   const { data: categories } = useCategories();
@@ -115,7 +113,6 @@ const Posts = () => {
       tags: formData.tags ? formData.tags.split(",").map(t => t.trim()) : [],
       seo_title: formData.seo_title || null,
       seo_description: formData.seo_description || null,
-      author_id: user?.id,
       published_at: formData.status === "published" ? new Date().toISOString() : null
     };
 
