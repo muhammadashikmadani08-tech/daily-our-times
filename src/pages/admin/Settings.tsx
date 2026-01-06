@@ -4,17 +4,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useSiteLogo, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
+import { useSiteLogo, useSiteUrl, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Image as ImageIcon, Trash2, Loader2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { Upload, Image as ImageIcon, Trash2, Loader2, Globe, Save } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
 
 export default function Settings() {
   const { toast } = useToast();
   const { data: currentLogo, isLoading } = useSiteLogo();
+  const { data: currentUrl } = useSiteUrl();
   const updateSetting = useUpdateSiteSetting();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [siteUrl, setSiteUrl] = useState("");
+
+  useEffect(() => {
+    if (currentUrl) {
+      setSiteUrl(currentUrl);
+    }
+  }, [currentUrl]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,6 +104,26 @@ export default function Settings() {
       toast({
         title: "লোগো সরানো হয়েছে",
         description: "সাইট লোগো সফলভাবে সরানো হয়েছে",
+      });
+    } catch (error: any) {
+      toast({
+        title: "ত্রুটি",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveUrl = async () => {
+    try {
+      await updateSetting.mutateAsync({
+        key: "site_url",
+        value: siteUrl || null,
+      });
+
+      toast({
+        title: "URL সংরক্ষিত",
+        description: "সাইট URL সফলভাবে আপডেট হয়েছে",
       });
     } catch (error: any) {
       toast({
@@ -192,6 +220,47 @@ export default function Settings() {
               </div>
               <p className="text-xs text-muted-foreground">
                 সর্বোচ্চ ফাইল সাইজ: ২ এমবি। স্বচ্ছ ব্যাকগ্রাউন্ড সহ PNG ফাইল ব্যবহার করুন।
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              সাইট URL
+            </CardTitle>
+            <CardDescription>
+              ফটো কার্ড এবং শেয়ার প্রিভিউতে প্রদর্শিত হবে
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>ওয়েবসাইট URL</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={siteUrl}
+                  onChange={(e) => setSiteUrl(e.target.value)}
+                  placeholder="www.yoursite.com"
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleSaveUrl}
+                  disabled={updateSetting.isPending}
+                >
+                  {updateSetting.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      সংরক্ষণ
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                এই URL ফটো কার্ড এবং সোশ্যাল মিডিয়া শেয়ার প্রিভিউতে দেখানো হবে।
               </p>
             </div>
           </CardContent>
