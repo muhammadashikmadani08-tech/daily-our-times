@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { usePosts, useCreatePost, useUpdatePost, useDeletePost, generateSlug } from "@/hooks/usePosts";
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Loader2, Eye } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Eye, Upload, Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import { supabase } from "@/integrations/supabase/client";
 const Posts = () => {
   const { toast } = useToast();
   const { data: posts, isLoading } = usePosts();
@@ -26,6 +26,8 @@ const Posts = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -90,6 +92,50 @@ const Posts = () => {
       title,
       slug: editingPost ? formData.slug : generateSlug(title)
     });
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "শুধুমাত্র ইমেজ ফাইল আপলোড করুন", variant: "destructive" });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "ফাইল সাইজ ৫MB এর কম হতে হবে", variant: "destructive" });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `posts/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('media')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, featured_image: publicUrl });
+      toast({ title: "ইমেজ আপলোড সফল হয়েছে" });
+    } catch (error: any) {
+      toast({ title: "আপলোড এরর", description: error.message, variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleSubmit = async () => {
@@ -207,15 +253,52 @@ const Posts = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>ফিচার ইমেজ URL</Label>
-                  <Input
-                    value={formData.featured_image}
-                    onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-                    placeholder="https://..."
-                  />
+                <div className="space-y-2 md:col-span-2">
+                  <Label>ফিচার ইমেজ</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={formData.featured_image}
+                      onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
+                      placeholder="https://... অথবা আপলোড করুন"
+                      className="flex-1"
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          আপলোড
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {formData.featured_image && (
+                    <div className="mt-2 relative rounded-lg overflow-hidden border bg-muted">
+                      <img
+                        src={formData.featured_image}
+                        alt="Preview"
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label>ইমেজ ক্যাপশন</Label>
                   <Input
                     value={formData.image_caption}
