@@ -26,6 +26,7 @@ const menuItems = [
   { icon: FileText, label: "পোস্ট", path: `${SECRET_ADMIN_PATH}/posts` },
   { icon: FolderTree, label: "ক্যাটাগরি", path: `${SECRET_ADMIN_PATH}/categories` },
   { icon: Image, label: "ফটো কার্ড", path: `${SECRET_ADMIN_PATH}/photo-cards` },
+  { icon: FileText, label: "ইউজার নিউজ", path: `${SECRET_ADMIN_PATH}/user-news` },
   { icon: Users, label: "ইউজার", path: `${SECRET_ADMIN_PATH}/users` },
   { icon: Settings, label: "সেটিংস", path: `${SECRET_ADMIN_PATH}/settings` },
 ];

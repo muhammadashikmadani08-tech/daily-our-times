@@ -9,12 +9,14 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NewsDetail from "./pages/NewsDetail";
 import Category from "./pages/Category";
+import SubmitNews from "./pages/SubmitNews";
 import Dashboard from "./pages/admin/Dashboard";
 import Posts from "./pages/admin/Posts";
 import Categories from "./pages/admin/Categories";
 import Users from "./pages/admin/Users";
 import Settings from "./pages/admin/Settings";
 import PhotoCards from "./pages/admin/PhotoCards";
+import UserNews from "./pages/admin/UserNews";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/submit-news" element={<SubmitNews />} />
               <Route path="/news/:slug" element={<NewsDetail />} />
               <Route path="/category/:slug" element={<Category />} />
               
@@ -41,6 +44,7 @@ const App = () => (
               <Route path={`/${SECRET_ADMIN_PATH}/posts`} element={<Posts />} />
               <Route path={`/${SECRET_ADMIN_PATH}/categories`} element={<Categories />} />
               <Route path={`/${SECRET_ADMIN_PATH}/photo-cards`} element={<PhotoCards />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/user-news`} element={<UserNews />} />
               <Route path={`/${SECRET_ADMIN_PATH}/users`} element={<Users />} />
               <Route path={`/${SECRET_ADMIN_PATH}/settings`} element={<Settings />} />
               
