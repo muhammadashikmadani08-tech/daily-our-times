@@ -15,7 +15,7 @@ export const usePosts = (status?: "draft" | "published") => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .order("published_at", { ascending: false, nullsFirst: false });
       
@@ -39,7 +39,7 @@ export const usePublishedPosts = () => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .eq("status", "published")
         .order("published_at", { ascending: false, nullsFirst: false });
@@ -59,7 +59,7 @@ export const usePostBySlug = (slug: string) => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .eq("slug", slug)
         .maybeSingle();
@@ -88,7 +88,7 @@ export const usePostsByCategory = (categorySlug: string) => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .eq("category_id", category.id)
         .eq("status", "published")
@@ -110,7 +110,7 @@ export const useFeaturedPosts = () => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .eq("status", "published")
         .eq("is_featured", true)
@@ -150,7 +150,7 @@ export const useLatestPosts = (limit = 10) => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .eq("status", "published")
         .order("published_at", { ascending: false })
@@ -171,7 +171,7 @@ export const useMostReadPosts = (limit = 10) => {
         .select(`
           *,
           category:categories(*),
-          author:profiles!posts_author_id_fkey(*)
+          author:profiles(*)
         `)
         .eq("status", "published")
         .order("views", { ascending: false })

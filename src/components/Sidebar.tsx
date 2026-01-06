@@ -1,12 +1,31 @@
 import { useState } from "react";
-import { getLatestNews, getMostReadNews, poll } from "@/data/news";
 import { NewsCard } from "./NewsCard";
 import { Button } from "@/components/ui/button";
+import { useLatestPosts, useMostReadPosts } from "@/hooks/usePosts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Sidebar = () => {
   const [activeTab, setActiveTab] = useState<"latest" | "popular">("latest");
-  const latestNews = getLatestNews(5);
-  const popularNews = getMostReadNews(5);
+  const { data: latestPosts, isLoading: latestLoading } = useLatestPosts(5);
+  const { data: mostReadPosts, isLoading: mostReadLoading } = useMostReadPosts(5);
+
+  const formatPostToNews = (post: any) => ({
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    subtitle: post.subtitle || undefined,
+    content: post.content || "",
+    excerpt: post.excerpt || "",
+    category: post.category || { id: "", name: "", slug: "", nameEn: "" },
+    author: post.author || { id: "", name: "" },
+    publishedAt: post.published_at || "",
+    imageUrl: post.featured_image || "",
+    tags: post.tags || [],
+    views: post.views || 0
+  });
+
+  const displayPosts = activeTab === "latest" ? latestPosts : mostReadPosts;
+  const isLoading = activeTab === "latest" ? latestLoading : mostReadLoading;
 
   return (
     <aside className="space-y-6">
@@ -31,34 +50,18 @@ export const Sidebar = () => {
           </button>
         </div>
         <div className="space-y-1">
-          {(activeTab === "latest" ? latestNews : popularNews).map((news) => (
-            <NewsCard key={news.id} news={news} variant="horizontal" />
-          ))}
+          {isLoading ? (
+            [1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-20 w-full" />
+            ))
+          ) : displayPosts && displayPosts.length > 0 ? (
+            displayPosts.map((post) => (
+              <NewsCard key={post.id} news={formatPostToNews(post)} variant="horizontal" />
+            ))
+          ) : (
+            <p className="text-muted-foreground text-sm">কোনো খবর নেই</p>
+          )}
         </div>
-      </div>
-
-      {/* Poll Widget */}
-      <div className="bg-card rounded p-4 border border-border">
-        <h3 className="font-serif font-bold mb-4 pb-2 border-b border-border">আপনার মতামত</h3>
-        <p className="text-sm mb-4">{poll.question}</p>
-        <div className="space-y-2">
-          {poll.options.map((option) => {
-            const percentage = Math.round((option.votes / poll.totalVotes) * 100);
-            return (
-              <div key={option.id} className="relative">
-                <div
-                  className="absolute inset-0 bg-primary/10 rounded"
-                  style={{ width: `${percentage}%` }}
-                />
-                <div className="relative flex justify-between items-center p-2 text-sm">
-                  <span>{option.text}</span>
-                  <span className="font-medium">{percentage}%</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <p className="text-xs text-muted-foreground mt-3">মোট ভোট: {poll.totalVotes.toLocaleString("bn-BD")}</p>
       </div>
 
       {/* Ad Block */}

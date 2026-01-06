@@ -1,6 +1,7 @@
 export interface NewsArticle {
   id: string;
   title: string;
+  slug?: string;
   subtitle?: string;
   content: string;
   excerpt: string;

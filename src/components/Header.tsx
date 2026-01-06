@@ -2,24 +2,30 @@ import { Link } from "react-router-dom";
 import { Search, Menu, X, Sun, Moon, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { categories } from "@/data/categories";
+import { useCategories } from "@/hooks/useCategories";
+import { useAuth } from "@/contexts/AuthContext";
+
 interface HeaderProps {
   isDark: boolean;
   toggleTheme: () => void;
 }
-export const Header = ({
-  isDark,
-  toggleTheme
-}: HeaderProps) => {
+
+export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: categories } = useCategories();
+  const { user, isStaff, signOut } = useAuth();
+
   const today = new Date().toLocaleDateString("bn-BD", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric"
   });
-  const mainMenuItems = categories.slice(0, 8);
-  return <header className="bg-background border-b border-border sticky top-0 z-50">
+
+  const mainMenuItems = categories?.slice(0, 8) || [];
+
+  return (
+    <header className="bg-background border-b border-border sticky top-0 z-50">
       {/* Top bar */}
       <div className="container py-2 flex items-center justify-between text-sm text-muted-foreground border-b border-border">
         <span>{today}</span>
@@ -27,10 +33,25 @@ export const Header = ({
           <Button variant="ghost" size="sm" onClick={toggleTheme}>
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Button variant="ghost" size="sm">
-            <User className="h-4 w-4 mr-1" />
-            <span className="hidden sm:inline">লগইন</span>
-          </Button>
+          {user ? (
+            <div className="flex items-center gap-2">
+              {isStaff && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/admin/dashboard">অ্যাডমিন</Link>
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                লগআউট
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/auth">
+                <User className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">লগইন</span>
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
       
@@ -41,7 +62,6 @@ export const Header = ({
           <Link to="/" className="flex items-center gap-2">
             <div className="text-primary-foreground font-serif font-bold text-xl bg-[#be2323] px-[13px] py-[9px] rounded">
               Daily    
-  
             </div>
             <div className="font-serif">
               <span className="text-2xl font-bold text-foreground text-justify py-0 px-0 mr-0 mb-0 pb-0 pr-0">Our Times</span>
@@ -54,9 +74,15 @@ export const Header = ({
             <Link to="/" className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">
               হোম
             </Link>
-            {mainMenuItems.map(cat => <Link key={cat.id} to={`/category/${cat.slug}`} className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors">
+            {mainMenuItems.map(cat => (
+              <Link 
+                key={cat.id} 
+                to={`/category/${cat.slug}`} 
+                className="px-3 py-2 text-sm font-medium hover:text-primary transition-colors"
+              >
                 {cat.name}
-              </Link>)}
+              </Link>
+            ))}
           </nav>
           
           {/* Search & Mobile menu */}
@@ -72,15 +98,25 @@ export const Header = ({
       </div>
       
       {/* Mobile menu */}
-      {mobileMenuOpen && <nav className="lg:hidden border-t border-border bg-background">
+      {mobileMenuOpen && (
+        <nav className="lg:hidden border-t border-border bg-background">
           <div className="container py-4 flex flex-col gap-2">
             <Link to="/" className="px-3 py-2 hover:bg-muted rounded" onClick={() => setMobileMenuOpen(false)}>
               হোম
             </Link>
-            {categories.map(cat => <Link key={cat.id} to={`/category/${cat.slug}`} className="px-3 py-2 hover:bg-muted rounded" onClick={() => setMobileMenuOpen(false)}>
+            {categories?.map(cat => (
+              <Link 
+                key={cat.id} 
+                to={`/category/${cat.slug}`} 
+                className="px-3 py-2 hover:bg-muted rounded" 
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 {cat.name}
-              </Link>)}
+              </Link>
+            ))}
           </div>
-        </nav>}
-    </header>;
+        </nav>
+      )}
+    </header>
+  );
 };
