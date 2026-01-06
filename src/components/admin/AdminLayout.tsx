@@ -8,7 +8,8 @@ import {
   Users, 
   Menu,
   X,
-  Home
+  Home,
+  Settings
 } from "lucide-react";
 import { useState } from "react";
 
@@ -24,6 +25,7 @@ const menuItems = [
   { icon: FileText, label: "পোস্ট", path: `${SECRET_ADMIN_PATH}/posts` },
   { icon: FolderTree, label: "ক্যাটাগরি", path: `${SECRET_ADMIN_PATH}/categories` },
   { icon: Users, label: "ইউজার", path: `${SECRET_ADMIN_PATH}/users` },
+  { icon: Settings, label: "সেটিংস", path: `${SECRET_ADMIN_PATH}/settings` },
 ];
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {

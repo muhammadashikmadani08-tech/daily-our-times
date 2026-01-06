@@ -13,6 +13,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import Posts from "./pages/admin/Posts";
 import Categories from "./pages/admin/Categories";
 import Users from "./pages/admin/Users";
+import Settings from "./pages/admin/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path={`/${SECRET_ADMIN_PATH}/posts`} element={<Posts />} />
               <Route path={`/${SECRET_ADMIN_PATH}/categories`} element={<Categories />} />
               <Route path={`/${SECRET_ADMIN_PATH}/users`} element={<Users />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/settings`} element={<Settings />} />
               
               {/* Redirect old admin routes to home */}
               <Route path="/admin/*" element={<Navigate to="/" replace />} />

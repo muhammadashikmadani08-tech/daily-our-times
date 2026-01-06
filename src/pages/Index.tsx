@@ -13,7 +13,7 @@ import { Helmet } from "react-helmet-async";
 const Index = () => {
   const { isDark, toggleTheme } = useTheme();
   const { data: featuredPost, isLoading: featuredLoading } = useFeaturedPosts();
-  const { data: latestPosts, isLoading: latestLoading } = useLatestPosts(6);
+  const { data: latestPosts, isLoading: latestLoading } = useLatestPosts(10);
   const { data: categories } = useCategories();
 
   const formatPostToNews = (post: any) => ({
@@ -33,6 +33,13 @@ const Index = () => {
     isBreaking: post.is_breaking
   });
 
+  // Get first post for featured section
+  const mainFeatured = featuredPost || latestPosts?.[0];
+  // Get remaining posts for the grid
+  const gridPosts = featuredPost 
+    ? latestPosts?.slice(0, 4) 
+    : latestPosts?.slice(1, 5);
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -43,43 +50,51 @@ const Index = () => {
       <Header isDark={isDark} toggleTheme={toggleTheme} />
       <BreakingNewsTicker />
 
-      <main className="container py-6">
-        {/* Hero Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2">
-            {featuredLoading ? (
-              <Skeleton className="h-96 w-full rounded-lg" />
-            ) : featuredPost ? (
-              <NewsCard news={formatPostToNews(featuredPost)} variant="large" />
-            ) : latestPosts?.[0] ? (
-              <NewsCard news={formatPostToNews(latestPosts[0])} variant="large" />
-            ) : (
-              <div className="h-96 bg-muted/50 rounded-lg flex items-center justify-center">
-                <p className="text-muted-foreground">কোনো ফিচার নিউজ নেই</p>
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+      <main className="container py-4 md:py-6">
+        {/* Featured News Section - Mobile First */}
+        <section className="mb-6">
+          {featuredLoading || latestLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="w-full aspect-[16/9] rounded-lg" />
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ) : mainFeatured ? (
+            <NewsCard news={formatPostToNews(mainFeatured)} variant="large" />
+          ) : (
+            <div className="aspect-[16/9] bg-muted/50 rounded-lg flex items-center justify-center">
+              <p className="text-muted-foreground">কোনো নিউজ নেই</p>
+            </div>
+          )}
+        </section>
+
+        {/* Latest News Grid - 2 columns on mobile */}
+        <section className="mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {latestLoading ? (
               [1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                <div key={i} className="space-y-2">
+                  <Skeleton className="w-full aspect-[4/3] rounded" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
               ))
             ) : (
-              latestPosts?.slice(1, 5).map((post) => (
+              gridPosts?.map((post) => (
                 <NewsCard key={post.id} news={formatPostToNews(post)} variant="small" />
               ))
             )}
           </div>
         </section>
 
-        {/* Main Content with Sidebar */}
+        {/* Main Content with Sidebar - Desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-2">
+          <div className="lg:col-span-2 space-y-6">
             {categories?.slice(0, 6).map((cat) => (
               <CategorySectionWrapper key={cat.id} category={cat} />
             ))}
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 hidden lg:block">
             <Sidebar />
           </div>
         </div>
