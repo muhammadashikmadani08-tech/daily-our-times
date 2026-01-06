@@ -11,11 +11,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { usePosts, useCreatePost, useUpdatePost, useDeletePost, generateSlug } from "@/hooks/usePosts";
+import { useGenerateAllPhotoCards } from "@/hooks/usePhotoCards";
 import { useCategories } from "@/hooks/useCategories";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Loader2, Eye, Upload, Image as ImageIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+
 const Posts = () => {
   const { toast } = useToast();
   const { data: posts, isLoading } = usePosts();
@@ -23,6 +25,7 @@ const Posts = () => {
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const deletePost = useDeletePost();
+  const generateAllCards = useGenerateAllPhotoCards();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
@@ -163,12 +166,30 @@ const Posts = () => {
     };
 
     try {
+      let postId: string;
+      const isNewPublish = formData.status === "published";
+      const wasPublished = editingPost?.status === "published";
+      
       if (editingPost) {
-        await updatePost.mutateAsync({ id: editingPost.id, ...postData });
+        const result = await updatePost.mutateAsync({ id: editingPost.id, ...postData });
+        postId = editingPost.id;
         toast({ title: "পোস্ট আপডেট হয়েছে" });
+        
+        // Generate photo cards if status changed to published
+        if (isNewPublish && !wasPublished) {
+          generateAllCards.mutate({ postId });
+          toast({ title: "ফটো কার্ড তৈরি হচ্ছে..." });
+        }
       } else {
-        await createPost.mutateAsync(postData);
+        const result = await createPost.mutateAsync(postData);
+        postId = result.id;
         toast({ title: "পোস্ট তৈরি হয়েছে" });
+        
+        // Generate photo cards if published immediately
+        if (isNewPublish) {
+          generateAllCards.mutate({ postId });
+          toast({ title: "ফটো কার্ড তৈরি হচ্ছে..." });
+        }
       }
       setDialogOpen(false);
       resetForm();

@@ -39,6 +39,22 @@ export const useSiteLogo = () => {
   });
 };
 
+export const useSiteUrl = () => {
+  return useQuery({
+    queryKey: ["site-url"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("setting_value")
+        .eq("setting_key", "site_url")
+        .single();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return data?.setting_value || null;
+    },
+  });
+};
+
 export const useUpdateSiteSetting = () => {
   const queryClient = useQueryClient();
 
@@ -69,6 +85,7 @@ export const useUpdateSiteSetting = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-settings"] });
       queryClient.invalidateQueries({ queryKey: ["site-logo"] });
+      queryClient.invalidateQueries({ queryKey: ["site-url"] });
     },
   });
 };

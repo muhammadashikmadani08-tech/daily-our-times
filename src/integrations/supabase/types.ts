@@ -74,6 +74,47 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_cards: {
+        Row: {
+          card_type: string
+          created_at: string
+          id: string
+          image_url: string | null
+          post_id: string
+          scheduled_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          card_type: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          post_id: string
+          scheduled_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          card_type?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          post_id?: string
+          scheduled_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_cards_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string | null

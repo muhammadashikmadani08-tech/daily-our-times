@@ -9,7 +9,8 @@ import {
   Menu,
   X,
   Home,
-  Settings
+  Settings,
+  Image
 } from "lucide-react";
 import { useState } from "react";
 
@@ -24,6 +25,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "ড্যাশবোর্ড", path: SECRET_ADMIN_PATH },
   { icon: FileText, label: "পোস্ট", path: `${SECRET_ADMIN_PATH}/posts` },
   { icon: FolderTree, label: "ক্যাটাগরি", path: `${SECRET_ADMIN_PATH}/categories` },
+  { icon: Image, label: "ফটো কার্ড", path: `${SECRET_ADMIN_PATH}/photo-cards` },
   { icon: Users, label: "ইউজার", path: `${SECRET_ADMIN_PATH}/users` },
   { icon: Settings, label: "সেটিংস", path: `${SECRET_ADMIN_PATH}/settings` },
 ];

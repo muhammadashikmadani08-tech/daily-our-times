@@ -1,1 +1,7 @@
 project_id = "fodxvgqjjbofgowrwoso"
+
+[functions.generate-photo-card]
+verify_jwt = false
+
+[functions.process-scheduled-cards]
+verify_jwt = false
