@@ -175,7 +175,7 @@ const UserNews = () => {
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
-                          {news.profile?.email || news.user_id.slice(0, 8) + "..."}
+                          {news.profile?.name || "অজানা ব্যবহারকারী"}
                         </span>
                       </TableCell>
                       <TableCell>

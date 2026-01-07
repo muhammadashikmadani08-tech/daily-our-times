@@ -23,9 +23,10 @@ const Users = () => {
       
       if (userIds.length === 0) return [];
 
+      // Only select name for non-admin display - email access is admin-only via RLS
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, name, email")
         .in("id", userIds);
       
       if (profilesError) throw profilesError;
