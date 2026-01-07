@@ -17,13 +17,12 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     // This function should only be called internally by cron or with service role key
-    // Verify the request has the service role key (for internal cron calls)
+    // Verify the request has the full service role key (for internal service calls)
     const authHeader = req.headers.get('Authorization');
-    const isServiceCall = authHeader?.includes(supabaseServiceKey.slice(0, 20));
+    const isServiceCall = authHeader === `Bearer ${supabaseServiceKey}`;
     
-    // Also allow calls from the Supabase scheduler (no auth header but internal)
+    // Also allow calls from the Supabase scheduler (internal cron trigger)
     const isSchedulerCall = req.headers.get('x-supabase-scheduler') === 'true';
-    
     if (!isServiceCall && !isSchedulerCall) {
       // Verify it's at least an authenticated staff user
       if (!authHeader?.startsWith('Bearer ')) {
