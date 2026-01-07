@@ -18,6 +18,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   roles: AppRole[];
   isLoading: boolean;
+  isRolesLoaded: boolean;
   isStaff: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRolesLoaded, setIsRolesLoaded] = useState(false);
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
@@ -48,27 +50,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const fetchRoles = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    
-    if (data) {
-      setRoles(data.map(r => r.role));
+    setIsRolesLoaded(false);
+    try {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+      
+      if (data) {
+        setRoles(data.map(r => r.role));
+      }
+    } finally {
+      setIsRolesLoaded(true);
     }
   };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-            fetchRoles(session.user.id);
-          }, 0);
+          // Use Promise.all to fetch both in parallel
+          await Promise.all([
+            fetchProfile(session.user.id),
+            fetchRoles(session.user.id)
+          ]);
         } else {
           setProfile(null);
           setRoles([]);
@@ -76,13 +84,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchProfile(session.user.id);
-        fetchRoles(session.user.id);
+        await Promise.all([
+          fetchProfile(session.user.id),
+          fetchRoles(session.user.id)
+        ]);
       }
       setIsLoading(false);
     });
@@ -125,6 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       profile,
       roles,
       isLoading,
+      isRolesLoaded,
       isStaff,
       isAdmin,
       isSuperAdmin,

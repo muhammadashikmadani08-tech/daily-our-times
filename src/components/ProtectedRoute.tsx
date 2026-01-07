@@ -8,9 +8,19 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children, requiredRole = "staff" }: ProtectedRouteProps) => {
-  const { user, isLoading, isStaff, isAdmin, isSuperAdmin } = useAuth();
+  const { user, isLoading, isRolesLoaded, isStaff, isAdmin, isSuperAdmin } = useAuth();
 
+  // Wait for auth to load
   if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+  
+  // If user exists but roles haven't loaded yet, keep showing loader
+  if (user && !isRolesLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
