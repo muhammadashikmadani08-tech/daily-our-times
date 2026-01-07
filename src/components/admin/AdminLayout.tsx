@@ -18,28 +18,22 @@ interface AdminLayoutProps {
   children: ReactNode;
 }
 
-// Admin base paths
+// Admin base path
 const ADMIN_PATH = "/admin";
-const SECRET_ADMIN_PATH = "/secure-admin-dashboard-9xK23";
 
-const getMenuItems = (basePath: string) => [
-  { icon: LayoutDashboard, label: "ড্যাশবোর্ড", path: basePath },
-  { icon: FileText, label: "পোস্ট", path: `${basePath}/posts` },
-  { icon: FolderTree, label: "ক্যাটাগরি", path: `${basePath}/categories` },
-  { icon: Image, label: "ফটো কার্ড", path: `${basePath}/photo-cards` },
-  { icon: FileText, label: "ইউজার নিউজ", path: `${basePath}/user-news` },
-  { icon: Users, label: "ইউজার", path: `${basePath}/users` },
-  { icon: Settings, label: "সেটিংস", path: `${basePath}/settings` },
+const menuItems = [
+  { icon: LayoutDashboard, label: "ড্যাশবোর্ড", path: ADMIN_PATH },
+  { icon: FileText, label: "পোস্ট", path: `${ADMIN_PATH}/posts` },
+  { icon: FolderTree, label: "ক্যাটাগরি", path: `${ADMIN_PATH}/categories` },
+  { icon: Image, label: "ফটো কার্ড", path: `${ADMIN_PATH}/photo-cards` },
+  { icon: FileText, label: "ইউজার নিউজ", path: `${ADMIN_PATH}/user-news` },
+  { icon: Users, label: "ইউজার", path: `${ADMIN_PATH}/users` },
+  { icon: Settings, label: "সেটিংস", path: `${ADMIN_PATH}/settings` },
 ];
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  // Detect which base path we're using
-  const isSecretPath = location.pathname.startsWith(SECRET_ADMIN_PATH);
-  const basePath = isSecretPath ? SECRET_ADMIN_PATH : ADMIN_PATH;
-  const menuItems = getMenuItems(basePath);
 
   return (
     <div className="min-h-screen bg-muted">
