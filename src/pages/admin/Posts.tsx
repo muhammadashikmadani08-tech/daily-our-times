@@ -107,6 +107,14 @@ const Posts = () => {
       return;
     }
 
+    // Validate file extension (whitelist)
+    const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    if (!fileExt || !allowedExts.includes(fileExt)) {
+      toast({ title: "অবৈধ ফাইল এক্সটেনশন। শুধুমাত্র JPG, PNG, GIF, WEBP অনুমোদিত", variant: "destructive" });
+      return;
+    }
+
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({ title: "ফাইল সাইজ ৫MB এর কম হতে হবে", variant: "destructive" });
@@ -115,7 +123,6 @@ const Posts = () => {
 
     setIsUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `posts/${fileName}`;
 
