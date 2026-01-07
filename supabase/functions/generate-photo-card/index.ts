@@ -33,6 +33,43 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
 
+    // Authentication check - require Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create admin client for role verification
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Verify user and check role
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if user is staff (admin, super_admin, or moderator)
+    const { data: roles } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const isStaff = roles?.some(r => ['super_admin', 'admin', 'moderator'].includes(r.role));
+    if (!isStaff) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - Staff access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { postId, cardType, scheduledAt } = await req.json() as CardRequest;

@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import DOMPurify from "dompurify";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Sidebar } from "@/components/Sidebar";
@@ -169,10 +170,10 @@ const NewsDetail = () => {
               </figure>
             )}
 
-            {/* Content */}
+            {/* Content - Sanitized to prevent XSS */}
             <div 
               className="news-content prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.content || "" }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || "") }}
             />
 
             {/* Tags */}
