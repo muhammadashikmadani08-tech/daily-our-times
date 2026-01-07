@@ -22,8 +22,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Admin route path
+// Admin route paths
 const ADMIN_PATH = "admin";
+const SECRET_ADMIN_PATH = "secure-admin-dashboard-9xK23";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -49,8 +50,14 @@ const App = () => (
               <Route path={`/${ADMIN_PATH}/users`} element={<ProtectedRoute requiredRole="super_admin"><Users /></ProtectedRoute>} />
               <Route path={`/${ADMIN_PATH}/settings`} element={<ProtectedRoute requiredRole="admin"><Settings /></ProtectedRoute>} />
               
-              {/* Redirect old secret path to proper admin */}
-              <Route path="/secure-admin-dashboard-9xK23/*" element={<Navigate to={`/${ADMIN_PATH}`} replace />} />
+              {/* Secret admin routes - Direct access without login */}
+              <Route path={`/${SECRET_ADMIN_PATH}`} element={<Dashboard />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/posts`} element={<Posts />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/categories`} element={<Categories />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/photo-cards`} element={<PhotoCards />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/user-news`} element={<UserNews />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/users`} element={<Users />} />
+              <Route path={`/${SECRET_ADMIN_PATH}/settings`} element={<Settings />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
