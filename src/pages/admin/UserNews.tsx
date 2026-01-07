@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DOMPurify from "dompurify";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -242,7 +243,7 @@ const UserNews = () => {
                   <p className="text-sm border-l-4 border-primary pl-4">{selectedNews.excerpt}</p>
                 )}
                 {selectedNews.content && (
-                  <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: selectedNews.content }} />
+                  <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedNews.content) }} />
                 )}
                 {selectedNews.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-2">

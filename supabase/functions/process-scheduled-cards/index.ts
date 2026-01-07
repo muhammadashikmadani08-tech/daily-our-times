@@ -6,6 +6,7 @@ const corsHeaders = {
 };
 
 // This function is called by cron to process scheduled photo cards
+// It requires service role access (internal use only)
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -14,6 +15,49 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    // This function should only be called internally by cron or with service role key
+    // Verify the request has the service role key (for internal cron calls)
+    const authHeader = req.headers.get('Authorization');
+    const isServiceCall = authHeader?.includes(supabaseServiceKey.slice(0, 20));
+    
+    // Also allow calls from the Supabase scheduler (no auth header but internal)
+    const isSchedulerCall = req.headers.get('x-supabase-scheduler') === 'true';
+    
+    if (!isServiceCall && !isSchedulerCall) {
+      // Verify it's at least an authenticated staff user
+      if (!authHeader?.startsWith('Bearer ')) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized - Internal use only' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+      
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Check admin role for manual trigger
+      const { data: roles } = await supabaseAdmin
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+
+      const isAdmin = roles?.some(r => ['super_admin', 'admin'].includes(r.role));
+      if (!isAdmin) {
+        return new Response(
+          JSON.stringify({ error: 'Forbidden - Admin access required' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

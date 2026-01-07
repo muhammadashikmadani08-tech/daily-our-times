@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NewsDetail from "./pages/NewsDetail";
@@ -21,8 +22,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Secret admin route
-const SECRET_ADMIN_PATH = "secure-admin-dashboard-9xK23";
+// Admin route path
+const ADMIN_PATH = "admin";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -39,17 +40,17 @@ const App = () => (
               <Route path="/news/:slug" element={<NewsDetail />} />
               <Route path="/category/:slug" element={<Category />} />
               
-              {/* Secret admin routes */}
-              <Route path={`/${SECRET_ADMIN_PATH}`} element={<Dashboard />} />
-              <Route path={`/${SECRET_ADMIN_PATH}/posts`} element={<Posts />} />
-              <Route path={`/${SECRET_ADMIN_PATH}/categories`} element={<Categories />} />
-              <Route path={`/${SECRET_ADMIN_PATH}/photo-cards`} element={<PhotoCards />} />
-              <Route path={`/${SECRET_ADMIN_PATH}/user-news`} element={<UserNews />} />
-              <Route path={`/${SECRET_ADMIN_PATH}/users`} element={<Users />} />
-              <Route path={`/${SECRET_ADMIN_PATH}/settings`} element={<Settings />} />
+              {/* Admin routes - Protected by role-based access control */}
+              <Route path={`/${ADMIN_PATH}`} element={<ProtectedRoute requiredRole="staff"><Dashboard /></ProtectedRoute>} />
+              <Route path={`/${ADMIN_PATH}/posts`} element={<ProtectedRoute requiredRole="admin"><Posts /></ProtectedRoute>} />
+              <Route path={`/${ADMIN_PATH}/categories`} element={<ProtectedRoute requiredRole="admin"><Categories /></ProtectedRoute>} />
+              <Route path={`/${ADMIN_PATH}/photo-cards`} element={<ProtectedRoute requiredRole="staff"><PhotoCards /></ProtectedRoute>} />
+              <Route path={`/${ADMIN_PATH}/user-news`} element={<ProtectedRoute requiredRole="staff"><UserNews /></ProtectedRoute>} />
+              <Route path={`/${ADMIN_PATH}/users`} element={<ProtectedRoute requiredRole="super_admin"><Users /></ProtectedRoute>} />
+              <Route path={`/${ADMIN_PATH}/settings`} element={<ProtectedRoute requiredRole="admin"><Settings /></ProtectedRoute>} />
               
-              {/* Redirect old admin routes to home */}
-              <Route path="/admin/*" element={<Navigate to="/" replace />} />
+              {/* Redirect old secret path to proper admin */}
+              <Route path="/secure-admin-dashboard-9xK23/*" element={<Navigate to={`/${ADMIN_PATH}`} replace />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
