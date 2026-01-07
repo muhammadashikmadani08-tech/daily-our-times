@@ -40,9 +40,10 @@ export const useAllUserNews = () => {
       const userIds = [...new Set(newsData.map(n => n.user_id))];
       
       // Fetch profiles for those users (staff can view all profiles)
+      // Note: Only select name, not email - minimize data exposure
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("id, name, email")
+        .select("id, name")
         .in("id", userIds);
       
       // Create a map for quick lookup
