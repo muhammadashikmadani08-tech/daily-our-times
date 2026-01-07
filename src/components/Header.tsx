@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
-import { Search, Menu, X, Sun, Moon, Send, LogIn, LogOut } from "lucide-react";
+import { Search, Menu, X, Sun, Moon, Send, LogIn, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCategories } from "@/hooks/useCategories";
 import { useSiteLogo } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/contexts/AuthContext";
-
 interface HeaderProps {
   isDark: boolean;
   toggleTheme: () => void;
@@ -15,7 +14,7 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: categories } = useCategories();
   const { data: siteLogo } = useSiteLogo();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isStaff } = useAuth();
   const isEmailVerified = user?.email_confirmed_at != null;
 
   return (
@@ -46,11 +45,20 @@ export const Header = ({ isDark, toggleTheme }: HeaderProps) => {
           {/* Right side icons */}
           <div className="flex items-center gap-1">
             {user && isEmailVerified && (
-              <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
-                <Link to="/submit-news">
-                  <Send className="h-5 w-5" />
-                </Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+                  <Link to="/submit-news">
+                    <Send className="h-5 w-5" />
+                  </Link>
+                </Button>
+                {isStaff && (
+                  <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
+                    <Link to="/admin">
+                      <Settings className="h-5 w-5" />
+                    </Link>
+                  </Button>
+                )}
+              </>
             )}
             <Button variant="ghost" size="icon" className="h-9 w-9">
               <Search className="h-5 w-5" />
