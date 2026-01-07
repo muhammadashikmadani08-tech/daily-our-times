@@ -161,18 +161,23 @@ const PhotoCards = () => {
     }
   };
 
-  // Group cards by post
-  const cardsByPost = photoCards?.reduce((acc, card) => {
+  // Group cards by post with proper typing
+  interface GroupedCards {
+    post: { id: string; title: string; slug: string; featured_image: string | null; is_breaking: boolean | null } | null;
+    cards: typeof photoCards extends (infer T)[] ? T[] : never[];
+  }
+  
+  const cardsByPost = photoCards?.reduce<Record<string, GroupedCards>>((acc, card) => {
     const postId = card.post_id;
     if (!acc[postId]) {
       acc[postId] = {
-        post: card.post,
+        post: (card as any).post ?? null,
         cards: []
       };
     }
     acc[postId].cards.push(card);
     return acc;
-  }, {} as Record<string, { post: any; cards: any[] }>);
+  }, {});
 
   return (
     <AdminLayout>
