@@ -38,6 +38,17 @@ export default function Settings() {
       return;
     }
 
+    // Validate file extension (whitelist - PNG only for logos)
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    if (fileExt !== 'png') {
+      toast({
+        title: "অবৈধ ফাইল এক্সটেনশন",
+        description: "শুধুমাত্র .png এক্সটেনশন অনুমোদিত",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Validate file size (max 2MB for logos)
     if (file.size > 2 * 1024 * 1024) {
       toast({
