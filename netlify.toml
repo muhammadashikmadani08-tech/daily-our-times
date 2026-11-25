@@ -1,0 +1,14 @@
+# Netlify deployment for Daily Our Times (root domain, not a subpath).
+# VITE_SUPABASE_PUBLISHABLE_KEY is NOT set here: add it in Netlify
+# Site settings > Environment variables, then redeploy, for news data to load.
+[build]
+  command = "npm run build -- --base=/"
+  publish = "dist"
+
+[build.environment]
+  VITE_SUPABASE_URL = "https://fodxvgqjjbofgowrwoso.supabase.co"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
